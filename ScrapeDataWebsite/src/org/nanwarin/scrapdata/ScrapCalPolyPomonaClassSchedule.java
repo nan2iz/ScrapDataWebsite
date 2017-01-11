@@ -1,12 +1,14 @@
 package org.nanwarin.scrapdata;
 
 
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class ScrapCalPolyPomonaClassSchedule {
 
@@ -16,14 +18,20 @@ public class ScrapCalPolyPomonaClassSchedule {
 
 		try {
 			searchResult = getSearchResult();
-			
+			System.out.println("Log ------- : Completed getSearchResult()");
 		} catch (IOException e) {
-			System.out.println("Error Search Classes"+ e);
+			System.out.println("Error Search Classes:"+ e);
 			e.printStackTrace();
 		}
 		
 		if(searchResult != null){
-			translateData(searchResult);
+			try {
+				translateData(searchResult);
+				System.out.println("Log ------- : Completed translateData()");
+			} catch (IOException e) {
+				System.out.println("Error Translate Data:" + e);
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -45,7 +53,7 @@ public class ScrapCalPolyPomonaClassSchedule {
         Element eventValidation = cppClassDoc.select("input[name=__EVENTVALIDATION]").first();
      
 		
-		Document document = Jsoup.connect(cppClassURL + "index.aspx")
+		result = Jsoup.connect(cppClassURL + "index.aspx")
 							.data("cookieexists", "false")
 							.data("__VIEWSTATE", viewState.attr("value"))
 							.data("__EVENTTARGET", eventTarget.attr("value"))
@@ -81,11 +89,43 @@ public class ScrapCalPolyPomonaClassSchedule {
 							.followRedirects(true)
 							.post();
 	
-		System.out.println("Log -- document: " + document.toString());
+		//System.out.println("Log -- document: " + document.toString());
 		return result;
 	}
 	
-	public static void translateData(Document doc){
+	public static void translateData(Document doc) throws IOException{
+		//Read HTML and translate to data for usage 
+		//CSV file 
+		//Get Class Number + Time
+		String csvFileName = "result.csv";
+		FileWriter writer = new FileWriter(csvFileName);
+		
+		Elements classes = doc.select("span.ClassTitle"); //<span class="ClassTitle" >
+		System.out.println("Log ------- : classes -> " + classes.size());
+		Elements tables = doc.select("table");
+		System.out.println("Log ------- : tables --> " + tables.size()); // Need to start at classes.size() + 2
+		
+		int index = 2; // Need to find better way
+		for(Element className:classes){
+			Element table = tables.get(index);
+			Elements rows = table.select(":not(thead) tr");
+			
+			for(Element row:rows){
+				Elements tds = row.select("td");
+				for(Element td:tds){
+					System.out.println("Log ------- : td text --> " + td.text());
+					writer.append(td.text());
+					writer.append(",");
+				}
+			}
+			//System.out.println("Class: " + className.text());
+			
+			//info will be at TD part
+			index++;
+			writer.append("\n");
+		}
+		//Loop to get all data 
+		
 		
 	}
 	
