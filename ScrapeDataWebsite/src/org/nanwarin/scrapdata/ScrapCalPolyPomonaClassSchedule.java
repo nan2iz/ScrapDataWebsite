@@ -110,6 +110,7 @@ public class ScrapCalPolyPomonaClassSchedule {
 			Element table = tables.get(index);
 			Elements rows = table.select(":not(thead) tr");
 			
+			////Need to screen data just get only info that we need
 			for(Element row:rows){
 				Elements tds = row.select("td");
 				for(Element td:tds){
