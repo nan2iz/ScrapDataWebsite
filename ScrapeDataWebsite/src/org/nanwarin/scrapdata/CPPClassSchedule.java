@@ -10,31 +10,25 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class ScrapCalPolyPomonaClassSchedule {
-
-	public static void main(String[] args){
-		
-		Document searchResult = null;
-
+public class CPPClassSchedule {
+	
+	private Document searchResult = null;
+	
+	public CPPClassSchedule(){
 		try {
 			searchResult = getSearchResult();
-			System.out.println("Log ------- : Completed getSearchResult()");
+			translateData(searchResult);
 		} catch (IOException e) {
-			System.out.println("Error Search Classes:"+ e);
+			System.out.println("Error at CPPClassSchedule()------- ");
 			e.printStackTrace();
 		}
 		
-		if(searchResult != null){
-			try {
-				translateData(searchResult);
-				System.out.println("Log ------- : Completed translateData()");
-			} catch (IOException e) {
-				System.out.println("Error Translate Data:" + e);
-				e.printStackTrace();
-			}
-		}
-
 	}
+
+	public Document getCppClasses(){
+		return searchResult;
+	}
+	
 	
 	public static Document getSearchResult() throws IOException{
 		Document result = null;
